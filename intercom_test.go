@@ -89,13 +89,28 @@ var _ = Describe("intercom", func() {
 
 	Describe("Logger", func() {
 		Describe("Errorf", func() {
-			It("prints a red formatted line to stderr", func() {
-				logger := NewLogger("debug")
-				out := capture(func() {
-					logger.Errorf("foo")
+			var logger *Logger
+
+			Context("the configured log level is not less than the debug level", func() {
+				BeforeEach(func() {
+					logger = NewLogger("debug")
 				})
 
-				Expect(out).Should(Equal("\033[1;31mfoo\033[0m\n"))
+				It("prints a red line to stderr", func() {
+					out := capture(func() {
+						logger.Errorf("foo")
+					})
+
+					Expect(out).Should(Equal("\033[1;31mfoo\033[0m\n"))
+				})
+
+				It("it correctly formats and prints strings", func() {
+					out := capture(func() {
+						logger.Errorf("foo %s", "bar")
+					})
+
+					Expect(out).Should(Equal("\033[1;31mfoo bar\033[0m\n"))
+				})
 			})
 		})
 
