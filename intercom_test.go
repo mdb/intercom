@@ -15,27 +15,6 @@ func TestIntercom(t *testing.T) {
 	RunSpecs(t, "intercom Suite")
 }
 
-func capture(f func()) string {
-	r, w, err := os.Pipe()
-	if err != nil {
-		panic(err)
-	}
-
-	stderr := os.Stderr
-	os.Stderr = w
-	defer func() {
-		os.Stderr = stderr
-	}()
-
-	f()
-	w.Close()
-
-	var buf bytes.Buffer
-	io.Copy(&buf, r)
-
-	return buf.String()
-}
-
 var _ = Describe("intercom", func() {
 	Describe("NewLogger", func() {
 		Context("when passed 'silent'", func() {
@@ -88,10 +67,10 @@ var _ = Describe("intercom", func() {
 	})
 
 	Describe("Logger", func() {
-		Describe("Errorf", func() {
-			var logger *Logger
+		var logger *Logger
 
-			Context("the configured log level is not less than the debug level", func() {
+		Describe("Errorf", func() {
+			Context("the configured log level is not less than the error level", func() {
 				BeforeEach(func() {
 					logger = NewLogger("debug")
 				})
@@ -126,36 +105,129 @@ var _ = Describe("intercom", func() {
 		})
 
 		Describe("Warnf", func() {
-			It("prints a yellow formatted line to stderr", func() {
-				logger := NewLogger("debug")
-				out := capture(func() {
-					logger.Warnf("foo")
+			Context("the configured log level is not less than the warn level", func() {
+				BeforeEach(func() {
+					logger = NewLogger("info")
 				})
 
-				Expect(out).Should(Equal("\033[1;33mfoo\033[0m\n"))
+				It("prints a yellow line to stderr", func() {
+					out := capture(func() {
+						logger.Warnf("foo")
+					})
+
+					Expect(out).Should(Equal("\033[1;33mfoo\033[0m\n"))
+				})
+
+				It("correctly formats and prints strings", func() {
+					out := capture(func() {
+						logger.Warnf("foo %s", "bar")
+					})
+
+					Expect(out).Should(Equal("\033[1;33mfoo bar\033[0m\n"))
+				})
+			})
+
+			Context("the configured log level is less than the warn level", func() {
+				It("prints nothing", func() {
+					logger := NewLogger("error")
+					out := capture(func() {
+						logger.Warnf("foo")
+					})
+
+					Expect(out).Should(Equal(""))
+				})
 			})
 		})
 
 		Describe("Infof", func() {
-			It("prints a green formatted line to stderr", func() {
-				logger := NewLogger("debug")
-				out := capture(func() {
-					logger.Infof("foo")
+			Context("the configured log level is not less than the info level", func() {
+				BeforeEach(func() {
+					logger = NewLogger("debug")
 				})
 
-				Expect(out).Should(Equal("\033[1;32mfoo\033[0m\n"))
+				It("prints a green formatted line to stderr", func() {
+					out := capture(func() {
+						logger.Infof("foo")
+					})
+
+					Expect(out).Should(Equal("\033[1;32mfoo\033[0m\n"))
+				})
+
+				It("correctly formats and prints strings", func() {
+					out := capture(func() {
+						logger.Infof("foo %s", "bar")
+					})
+
+					Expect(out).Should(Equal("\033[1;32mfoo bar\033[0m\n"))
+				})
+			})
+
+			Context("the configured log level is less than the info level", func() {
+				It("prints nothing", func() {
+					logger := NewLogger("error")
+					out := capture(func() {
+						logger.Warnf("foo")
+					})
+
+					Expect(out).Should(Equal(""))
+				})
 			})
 		})
 
 		Describe("Debugf", func() {
-			It("prints a blue formatted line to stderr", func() {
-				logger := NewLogger("debug")
-				out := capture(func() {
-					logger.Debugf("foo")
+			Context("the configured log level is not less than the debug level", func() {
+				BeforeEach(func() {
+					logger = NewLogger("debug")
 				})
 
-				Expect(out).Should(Equal("\033[1;34mfoo\033[0m\n"))
+				It("prints a blue formatted line to stderr", func() {
+					out := capture(func() {
+						logger.Debugf("foo")
+					})
+
+					Expect(out).Should(Equal("\033[1;34mfoo\033[0m\n"))
+				})
+
+				It("correctly formats and prints strings", func() {
+					out := capture(func() {
+						logger.Debugf("foo %s", "bar")
+					})
+
+					Expect(out).Should(Equal("\033[1;34mfoo bar\033[0m\n"))
+				})
+			})
+
+			Context("the configured log level is less than the debug level", func() {
+				It("prints nothing", func() {
+					logger := NewLogger("error")
+					out := capture(func() {
+						logger.Warnf("foo")
+					})
+
+					Expect(out).Should(Equal(""))
+				})
 			})
 		})
 	})
 })
+
+func capture(f func()) string {
+	r, w, err := os.Pipe()
+	if err != nil {
+		panic(err)
+	}
+
+	stderr := os.Stderr
+	os.Stderr = w
+	defer func() {
+		os.Stderr = stderr
+	}()
+
+	f()
+	w.Close()
+
+	var buf bytes.Buffer
+	io.Copy(&buf, r)
+
+	return buf.String()
+}
