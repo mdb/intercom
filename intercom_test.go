@@ -112,6 +112,17 @@ var _ = Describe("intercom", func() {
 					Expect(out).Should(Equal("\033[1;31mfoo bar\033[0m\n"))
 				})
 			})
+
+			Context("the configured log level is less than the error level", func() {
+				It("prints nothing", func() {
+					logger = NewLogger("silent")
+					out := capture(func() {
+						logger.Errorf("foo")
+					})
+
+					Expect(out).Should(Equal(""))
+				})
+			})
 		})
 
 		Describe("Warnf", func() {
