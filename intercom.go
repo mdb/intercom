@@ -58,7 +58,7 @@ func NewLogger(level string) *Logger {
 
 // Errorf logs a red formatted string followed by a new line.
 func (l *Logger) Errorf(message string, args ...interface{}) {
-	if l.Level <= errorLevel {
+	if l.Level < errorLevel {
 		return
 	}
 
@@ -68,7 +68,7 @@ func (l *Logger) Errorf(message string, args ...interface{}) {
 
 // Warnf logs a yellow formatted string followed by a new line.
 func (l *Logger) Warnf(message string, args ...interface{}) {
-	if l.Level <= warnLevel {
+	if l.Level < warnLevel {
 		return
 	}
 
@@ -78,7 +78,7 @@ func (l *Logger) Warnf(message string, args ...interface{}) {
 
 // Infof logs a green formatted string followed by a new line.
 func (l *Logger) Infof(message string, args ...interface{}) {
-	if l.Level <= infoLevel {
+	if l.Level < infoLevel {
 		return
 	}
 
@@ -88,7 +88,7 @@ func (l *Logger) Infof(message string, args ...interface{}) {
 
 // Debugf logs a blue formatted string followed by a new line.
 func (l *Logger) Debugf(message string, args ...interface{}) {
-	if l.Level <= debugLevel {
+	if l.Level < debugLevel {
 		return
 	}
 
