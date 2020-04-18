@@ -41,12 +41,3 @@ func Test_NewLogger_debug_level(t *testing.T) {
 
 	assert.Equal(t, logger.Level, debugLevel)
 }
-
-func Test_Errorf(t *testing.T) {
-	logger := NewLogger("info")
-	bar := "bar"
-
-	output := logger.Errorf("foo %s", bar)
-
-	assert.Equal(t, output, "foo bar")
-}
