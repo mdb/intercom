@@ -76,7 +76,7 @@ var _ = Describe("intercom", func() {
 				})
 
 				It("prints a red line to stderr", func() {
-					out := capture(func() {
+					out := captureErr(func() {
 						logger.Errorf("foo")
 					})
 
@@ -84,18 +84,26 @@ var _ = Describe("intercom", func() {
 				})
 
 				It("it correctly formats and prints strings", func() {
-					out := capture(func() {
+					out := captureErr(func() {
 						logger.Errorf("foo %s", "bar")
 					})
 
 					Expect(out).Should(Equal("\033[1;31mfoo bar\033[0m\n"))
+				})
+
+				It("it does not write to stdout", func() {
+					out := captureOut(func() {
+						logger.Errorf("foo %s", "bar")
+					})
+
+					Expect(out).Should(Equal(""))
 				})
 			})
 
 			Context("the configured log level is less than the error level", func() {
 				It("prints nothing", func() {
 					logger = NewLogger("silent")
-					out := capture(func() {
+					out := captureErr(func() {
 						logger.Errorf("foo")
 					})
 
@@ -111,7 +119,7 @@ var _ = Describe("intercom", func() {
 				})
 
 				It("prints a yellow line to stderr", func() {
-					out := capture(func() {
+					out := captureErr(func() {
 						logger.Warnf("foo")
 					})
 
@@ -119,18 +127,26 @@ var _ = Describe("intercom", func() {
 				})
 
 				It("correctly formats and prints strings", func() {
-					out := capture(func() {
+					out := captureErr(func() {
 						logger.Warnf("foo %s", "bar")
 					})
 
 					Expect(out).Should(Equal("\033[1;33mfoo bar\033[0m\n"))
+				})
+
+				It("it does not write to stdout", func() {
+					out := captureOut(func() {
+						logger.Warnf("foo %s", "bar")
+					})
+
+					Expect(out).Should(Equal(""))
 				})
 			})
 
 			Context("the configured log level is less than the warn level", func() {
 				It("prints nothing", func() {
 					logger := NewLogger("error")
-					out := capture(func() {
+					out := captureErr(func() {
 						logger.Warnf("foo")
 					})
 
@@ -146,7 +162,7 @@ var _ = Describe("intercom", func() {
 				})
 
 				It("prints a green formatted line to stderr", func() {
-					out := capture(func() {
+					out := captureErr(func() {
 						logger.Infof("foo")
 					})
 
@@ -154,18 +170,26 @@ var _ = Describe("intercom", func() {
 				})
 
 				It("correctly formats and prints strings", func() {
-					out := capture(func() {
+					out := captureErr(func() {
 						logger.Infof("foo %s", "bar")
 					})
 
 					Expect(out).Should(Equal("\033[1;32mfoo bar\033[0m\n"))
+				})
+
+				It("it does not write to stdout", func() {
+					out := captureOut(func() {
+						logger.Infof("foo %s", "bar")
+					})
+
+					Expect(out).Should(Equal(""))
 				})
 			})
 
 			Context("the configured log level is less than the info level", func() {
 				It("prints nothing", func() {
 					logger := NewLogger("error")
-					out := capture(func() {
+					out := captureErr(func() {
 						logger.Warnf("foo")
 					})
 
@@ -181,7 +205,7 @@ var _ = Describe("intercom", func() {
 				})
 
 				It("prints a blue formatted line to stderr", func() {
-					out := capture(func() {
+					out := captureErr(func() {
 						logger.Debugf("foo")
 					})
 
@@ -189,18 +213,26 @@ var _ = Describe("intercom", func() {
 				})
 
 				It("correctly formats and prints strings", func() {
-					out := capture(func() {
+					out := captureErr(func() {
 						logger.Debugf("foo %s", "bar")
 					})
 
 					Expect(out).Should(Equal("\033[1;34mfoo bar\033[0m\n"))
+				})
+
+				It("it does not write to stdout", func() {
+					out := captureOut(func() {
+						logger.Debugf("foo %s", "bar")
+					})
+
+					Expect(out).Should(Equal(""))
 				})
 			})
 
 			Context("the configured log level is less than the debug level", func() {
 				It("prints nothing", func() {
 					logger := NewLogger("error")
-					out := capture(func() {
+					out := captureErr(func() {
 						logger.Warnf("foo")
 					})
 
@@ -211,7 +243,7 @@ var _ = Describe("intercom", func() {
 	})
 })
 
-func capture(f func()) string {
+func captureErr(f func()) string {
 	r, w, err := os.Pipe()
 	if err != nil {
 		panic(err)
@@ -221,6 +253,27 @@ func capture(f func()) string {
 	os.Stderr = w
 	defer func() {
 		os.Stderr = stderr
+	}()
+
+	f()
+	w.Close()
+
+	var buf bytes.Buffer
+	io.Copy(&buf, r)
+
+	return buf.String()
+}
+
+func captureOut(f func()) string {
+	r, w, err := os.Pipe()
+	if err != nil {
+		panic(err)
+	}
+
+	stdout := os.Stdout
+	os.Stdout = w
+	defer func() {
+		os.Stdout = stdout
 	}()
 
 	f()
