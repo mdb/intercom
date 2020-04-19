@@ -1,3 +1,5 @@
+![](https://github.com/mdb/intercom/workflows/CI/badge.svg)
+
 # intercom
 
 A small logging package for use in Golang-based [Concourse resource type implementations](https://concourse-ci.org/implementing-resource-types.html)
