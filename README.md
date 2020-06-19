@@ -2,7 +2,7 @@
 
 # intercom
 
-A small logging package for use in Golang-based [Concourse resource type implementations](https://concourse-ci.org/implementing-resource-types.html)
+A small logging package for use in Golang-based [Concourse resource type implementations](https://concourse-ci.org/implementing-resource-types.html).
 
 Because Concourse resources communicate with Concourse over stdout, it's [recommended](https://concourse-ci.org/implementing-resource-types.html) that:
 
