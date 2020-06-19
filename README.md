@@ -39,7 +39,7 @@ logger.Errorf("foo %s", "bar")
 
 ## Exposing log level configuration to users
 
-By using `intercom` as a configurable logger, Concourse [resource authors](https://concourse-ci.org/implementing-resource-types.html) can expose log level configuration to users, enabling end users better troubleshooting capabilities via a configurable `source` field:
+By using `intercom` as a configurable logger, Concourse [resource authors](https://concourse-ci.org/implementing-resource-types.html) can expose log level configuration options to users, in effect giving resource users troubleshooting capabilities via a configurable `source` field:
 
 ```yaml
 resource_types:
