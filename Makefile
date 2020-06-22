@@ -1,2 +1,3 @@
 test:
-	go test
+	go vet
+	go test -cover
