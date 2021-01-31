@@ -91,7 +91,7 @@ var _ = Describe("intercom", func() {
 					Expect(e).Should(Equal("\033[1;31mfoo bar\033[0m\n"))
 				})
 
-				It("it does not write to stdout", func() {
+				It("does not write to stdout", func() {
 					o, _ := capture(func() {
 						logger.Errorf("foo %s", "bar")
 					})
@@ -135,7 +135,7 @@ var _ = Describe("intercom", func() {
 					Expect(e).Should(Equal("\033[1;33mfoo bar\033[0m\n"))
 				})
 
-				It("it does not write to stdout", func() {
+				It("does not write to stdout", func() {
 					o, _ := capture(func() {
 						logger.Warnf("foo %s", "bar")
 					})
@@ -179,7 +179,7 @@ var _ = Describe("intercom", func() {
 					Expect(e).Should(Equal("\033[1;32mfoo bar\033[0m\n"))
 				})
 
-				It("it does not write to stdout", func() {
+				It("does not write to stdout", func() {
 					o, _ := capture(func() {
 						logger.Infof("foo %s", "bar")
 					})
@@ -223,7 +223,7 @@ var _ = Describe("intercom", func() {
 					Expect(e).Should(Equal("\033[1;34mfoo bar\033[0m\n"))
 				})
 
-				It("it does not write to stdout", func() {
+				It("does not write to stdout", func() {
 					o, _ := capture(func() {
 						logger.Debugf("foo %s", "bar")
 					})
